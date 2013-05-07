@@ -88,6 +88,75 @@ URLProtocol file_protocol = {
     file_close,
 };
 
+/* standard memory protocol */
+
+static int memory_open(URLContext *h, const char *memoryname, int flags)
+{
+    MemoryStreamDefinition *md = NULL;
+	char *split[2];
+
+	md = av_mallocz(sizeof(MemoryStreamDefinition));
+
+	av_strstart(memoryname, "memory:", &memoryname);
+
+    split[0] = strtok(memoryname, "|"); // Splits spaces between words in str
+    split[1] = strtok(NULL, "|");
+
+	md->curr = atoi(split[0]);
+	md->start = md->curr;
+	md->size = atoi(split[1]);
+	
+    h->priv_data = md;
+
+	return 0;
+}
+
+static int memory_read(URLContext *h, unsigned char *buf, int size)
+{
+    MemoryStreamDefinition *md = h->priv_data;
+	
+	int readable = md->size - (md->curr - md->start);
+
+	if (readable <= 0)
+		return 0;
+
+	if (size < readable)
+		readable = size;
+
+	for (int i = 0; i < readable; i++)
+		*(buf++) = *(md->curr++);
+
+    return readable;
+}
+
+static int memory_write(URLContext *h, unsigned char *buf, int size)
+{
+    return -1;
+}
+
+/* XXX: use llseek */
+static offset_t memory_seek(URLContext *h, offset_t pos, int whence)
+{
+    MemoryStreamDefinition *md = h->priv_data;
+	md->curr = md->start + pos;
+	return (int)md->curr;
+}
+
+static int memory_close(URLContext *h)
+{
+    av_free(h->priv_data);
+	return 0;
+}
+
+URLProtocol memory_protocol = {
+    "memory",
+    memory_open,
+    memory_read,
+    memory_write,
+    memory_seek,
+    memory_close,
+};
+
 /* pipe protocol */
 
 static int pipe_open(URLContext *h, const char *filename, int flags)

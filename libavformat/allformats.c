@@ -198,6 +198,7 @@ void av_register_all(void)
 
     /* protocols */
     REGISTER_PROTOCOL (FILE, file);
+    REGISTER_PROTOCOL (MEMORY, memory);
     REGISTER_PROTOCOL (HTTP, http);
     REGISTER_PROTOCOL (PIPE, pipe);
     REGISTER_PROTOCOL (RTP, rtp);

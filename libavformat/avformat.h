@@ -46,6 +46,12 @@ unsigned avformat_version(void);
 
 #include "avio.h"
 
+typedef struct MemoryStreamDefinition {
+	char *curr;
+	char *start;
+	int size;
+} MemoryStreamDefinition;
+
 /* packet functions */
 
 typedef struct AVPacket {
@@ -727,6 +733,14 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
                        AVInputFormat *fmt,
                        int buf_size,
                        AVFormatParameters *ap);
+
+/** HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAX */
+int av_open_input_file_hax(AVFormatContext **ic_ptr, const char *filename,
+						uint8_t *buf,
+                       AVInputFormat *fmt,
+                       int buf_size,
+                       AVFormatParameters *ap);
+
 /**
  * Allocate an AVFormatContext.
  * Can be freed with av_free() but do not forget to free everything you
